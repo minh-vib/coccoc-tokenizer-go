@@ -41,7 +41,11 @@ public class Tokenizer {
 		if (text == null) {
 			throw new IllegalArgumentException("text is null");
 		}
+
 		long resPointer = segmentPointer(text, for_transforming, tokenizeOption, keep_puncts);
+		if(resPointer < 0) {
+			throw new IllegalArgumentException("segmentPointer JNI error");
+		}
 
 		ArrayList<Token> res = new ArrayList<>();
 		// Positions from JNI implementation .cpp file
