@@ -64,13 +64,13 @@ JNIEXPORT jlong JNICALL Java_com_coccoc_Tokenizer_segmentPointer(
 	res_pointer[6] = (int64_t) space_positions->data();
 	res_pointer[7] = (int64_t) space_positions;
 
-	return reinterpret_cast<jlong> res_pointer;
+	return reinterpret_cast<jlong>(res_pointer);
 }
 
 JNIEXPORT void JNICALL Java_com_coccoc_Tokenizer_freeMemory(JNIEnv *env, jobject obj, jlong res_pointer)
 {
 	// Cast each object pointer to their respective type, must be careful
-	int64_t *p = reinterpret_cast<int64_t *> res_pointer;
+	int64_t *p = reinterpret_cast<int64_t *>(res_pointer);
 	if (p == nullptr) {
 		return;
 	}
