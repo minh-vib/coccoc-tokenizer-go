@@ -1,3 +1,4 @@
+// clang-format off
 #if !defined(spp_smartptr_h_guard)
 #define spp_smartptr_h_guard
 

@@ -1,3 +1,4 @@
+// clang-format off
 /**
    Copyright (c) 2016 Mariano Gonzalez
 

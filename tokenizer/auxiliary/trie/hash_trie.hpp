@@ -15,6 +15,7 @@ struct HashTrie
 
 	std::vector< Node > pool;
 	fast_hash_set_t< uint32_t > alphabet;
+	std::shared_mutex mtwrite;
 
 	HashTrie()
 	{
@@ -25,6 +26,8 @@ struct HashTrie
 	{
 		pool[u].children[c] = pool.size();
 		pool.push_back(Node());
+
+		std::lock_guard<std::shared_mutex> lock(mtwrite);
 		alphabet.insert(c);
 	}
 
@@ -70,6 +73,7 @@ struct HashTrie
 
 	std::set< uint32_t > dump_alphabet()
 	{
+		std::shared_lock<std::shared_mutex> lock(mtwrite);
 		return std::set< uint32_t >(alphabet.begin(), alphabet.end());
 	}
 };

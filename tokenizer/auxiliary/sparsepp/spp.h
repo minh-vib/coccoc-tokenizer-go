@@ -1,3 +1,5 @@
+// clang-format off
+
 #if !defined(sparsepp_h_guard_)
 #define sparsepp_h_guard_
 

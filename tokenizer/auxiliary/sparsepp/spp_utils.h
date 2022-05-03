@@ -1,3 +1,4 @@
+// clang-format off
 // ----------------------------------------------------------------------
 // Copyright (c) 2016, Steven Gregory Popovitch - greg7mdp@gmail.com
 // All rights reserved.
@@ -417,7 +418,10 @@ public:
 
     void deallocate(pointer p, size_t /* unused */) 
     {
-        free(p);
+        if(p) {
+            free(p);
+            p = nullptr;
+        }
     }
 
     pointer reallocate(pointer p, size_t new_size) 

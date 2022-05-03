@@ -1,3 +1,4 @@
+// clang-format off
 #ifndef spp_dlalloc__h_
 #define spp_dlalloc__h_
 
