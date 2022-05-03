@@ -1,4 +1,3 @@
-// clang-format off
 // ----------------------------------------------------------------------
 // Copyright (c) 2016, Steven Gregory Popovitch - greg7mdp@gmail.com
 // All rights reserved.
@@ -81,11 +80,11 @@
         #define SPP_NO_CXX11_NOEXCEPT
     #endif
 #elif defined __clang__
-    #if __has_feature(cxx_noexcept)  // what to use here?
+    #if __has_feature(cxx_noexcept) || defined(SPP_CXX11) // define SPP_CXX11 if your compiler has <functional>
        #include <functional>
        #define SPP_HASH_CLASS  std::hash
     #else
-       #include <tr1/unordered_map>
+       #include <tr1/functional>
        #define SPP_HASH_CLASS std::tr1::hash
     #endif
 
@@ -410,7 +409,10 @@ public:
 
     pointer allocate(size_t n, const_pointer  /* unused */= 0) 
     {
-        return static_cast<pointer>(malloc(n * sizeof(T)));
+        pointer res = static_cast<pointer>(malloc(n * sizeof(T)));
+        if (!res)
+            throw std::bad_alloc();
+        return res;
     }
 
     void deallocate(pointer p, size_t /* unused */) 
@@ -420,7 +422,10 @@ public:
 
     pointer reallocate(pointer p, size_t new_size) 
     {
-        return static_cast<pointer>(realloc(p, new_size * sizeof(T)));
+        pointer res = static_cast<pointer>(realloc(p, new_size * sizeof(T)));
+        if (!res)
+            throw std::bad_alloc();
+        return res;
     }
 
     // extra API to match spp_allocator interface

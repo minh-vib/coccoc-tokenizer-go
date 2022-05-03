@@ -1,4 +1,3 @@
-// clang-format off
 #if !defined(spp_traits_h_guard)
 #define spp_traits_h_guard
 

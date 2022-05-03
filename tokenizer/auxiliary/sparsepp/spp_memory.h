@@ -1,4 +1,3 @@
-// clang-format off
 #if !defined(spp_memory_h_guard)
 #define spp_memory_h_guard
 
