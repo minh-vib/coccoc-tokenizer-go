@@ -6,6 +6,7 @@
 #include <string>
 #include "../utf8.h"
 #include "../tsl/robin_set.h"
+#include <shared_mutex>
 
 template < class Node >
 struct HashTrie

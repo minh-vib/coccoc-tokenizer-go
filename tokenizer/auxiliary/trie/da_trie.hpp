@@ -15,7 +15,6 @@ struct DATrie
 	std::vector< Node > pool;
 	std::vector< int > char_map;
 	int alphabet_size;
-	std::shared_mutex mtwrite;
 
 	DATrie()
 	{
