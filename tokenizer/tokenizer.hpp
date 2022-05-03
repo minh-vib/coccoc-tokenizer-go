@@ -13,6 +13,7 @@
 #include "auxiliary/file_serializer.hpp"
 #include "helper.hpp"
 #include "token.hpp"
+#include <mutex>
 
 class Tokenizer
 {
@@ -35,6 +36,7 @@ private:
 	// An array of HashMaps, represent sparse 2D array of weights
 	// Used for retrieving 2-gram weights in sticky-text-segmentation
 	std::vector< fast_map_t > nontone_pair_freq_map;
+	std::mutex mtrw;
 
 	struct Range
 	{
@@ -83,7 +85,11 @@ private:
 			fclose(in);
 			return -1;
 		}
+
+		mtrw.lock();
 		nontone_pair_freq_map.resize(n);
+		mtrw.unlock();
+
 		FileSerializer serializer;
 		for (int i = 0; i < n; ++i)
 		{
@@ -597,7 +603,13 @@ public:
 				}
 
 				Token last_token = ranges.back();
-				if (last_token.seg_type == T::URL_SEG_TYPE && !nontone_pair_freq_map.empty())
+
+				bool nontone_pair_freq_map_status = false;
+				mtrw.lock();
+				nontone_pair_freq_map_status = nontone_pair_freq_map.empty();
+				mtrw.unlock();
+
+				if (last_token.seg_type == T::URL_SEG_TYPE && !nontone_pair_freq_map_status)
 				{
 					// sticky tokenization on URL parts
 					std::vector< int > sub_space_positions;
