@@ -13,7 +13,7 @@
 #include "auxiliary/file_serializer.hpp"
 #include "helper.hpp"
 #include "token.hpp"
-#include <mutex>
+//#include <mutex>
 
 class Tokenizer
 {
@@ -36,7 +36,7 @@ private:
 	// An array of HashMaps, represent sparse 2D array of weights
 	// Used for retrieving 2-gram weights in sticky-text-segmentation
 	std::vector< fast_map_t > nontone_pair_freq_map;
-	std::mutex mtrw;
+	//std::mutex mtrw;
 
 	struct Range
 	{
@@ -86,9 +86,9 @@ private:
 			return -1;
 		}
 
-		mtrw.lock();
+		//mtrw.lock();
 		nontone_pair_freq_map.resize(n);
-		mtrw.unlock();
+		//mtrw.unlock();
 
 		FileSerializer serializer;
 		for (int i = 0; i < n; ++i)
