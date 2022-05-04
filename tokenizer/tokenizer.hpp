@@ -604,12 +604,12 @@ public:
 
 				Token last_token = ranges.back();
 
-				bool nontone_pair_freq_map_status = false;
-				mtrw.lock();
-				nontone_pair_freq_map_status = nontone_pair_freq_map.empty();
-				mtrw.unlock();
+				//bool nontone_pair_freq_map_status = false;
+				//mtrw.lock();
+				//nontone_pair_freq_map_status = nontone_pair_freq_map.empty();
+				//mtrw.unlock();
 
-				if (last_token.seg_type == T::URL_SEG_TYPE && !nontone_pair_freq_map_status)
+				if (last_token.seg_type == T::URL_SEG_TYPE && !nontone_pair_freq_map.empty())
 				{
 					// sticky tokenization on URL parts
 					std::vector< int > sub_space_positions;
