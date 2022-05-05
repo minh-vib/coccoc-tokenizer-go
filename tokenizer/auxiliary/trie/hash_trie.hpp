@@ -6,8 +6,6 @@
 #include <string>
 #include "../utf8.h"
 #include "../tsl/robin_set.h"
-#include <mutex>
-#include <iterator>
 
 template < class Node >
 struct HashTrie
@@ -17,7 +15,6 @@ struct HashTrie
 
 	std::vector< Node > pool;
 	fast_hash_set_t< uint32_t > alphabet;
-	std::mutex mtrw;
 
 	HashTrie()
 	{
@@ -28,10 +25,7 @@ struct HashTrie
 	{
 		pool[u].children[c] = pool.size();
 		pool.push_back(Node());
-
-		mtrw.lock();
 		alphabet.insert(c);
-		mtrw.unlock();
 	}
 
 	inline bool has_child(int u, uint32_t c)
@@ -76,13 +70,7 @@ struct HashTrie
 
 	std::set< uint32_t > dump_alphabet()
 	{
-		std::set< uint32_t > data;
-
-		mtrw.lock();
-		std::copy(alphabet.begin(), alphabet.end(), std::inserter(data, data.begin()));
-		mtrw.unlock();
-
-		return data;
+		return std::set< uint32_t >(alphabet.begin(), alphabet.end());
 	}
 };
 

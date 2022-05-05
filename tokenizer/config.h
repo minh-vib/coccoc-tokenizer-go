@@ -2,7 +2,7 @@
 #define __TOKENIZER_CONFIG_H__
 
 #ifndef DICT_PATH
-#define DICT_PATH "/usr/local/share/tokenizer/dicts"
+#define DICT_PATH "/usr/share/tokenizer/dicts"
 #endif
 
 #define MULTITERM_DICT_DUMP "multiterm_trie.dump"
