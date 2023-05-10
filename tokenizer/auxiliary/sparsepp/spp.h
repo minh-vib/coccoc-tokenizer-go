@@ -2089,7 +2089,8 @@ public:
             if (sz)
             {
                 _alloc_group_array(sz, first, last);
-                memcpy(static_cast<void *>(first), _first_group, sizeof(*first) * (std::min)(sz, old_sz));
+                if (old_sz)
+                    memcpy(static_cast<void *>(first), _first_group, sizeof(*first) * (std::min)(sz, old_sz));
             }
 
             if (sz < old_sz)
@@ -3720,7 +3721,11 @@ public:
         rep(std::move(o.rep), alloc)
     {}
 
-    sparse_hash_map& operator=(sparse_hash_map &&o) = default;
+    sparse_hash_map& operator=(sparse_hash_map &&o)
+    {
+        rep = std::move(o.rep);
+        return *this;
+    }
 #endif
 
 #if !defined(SPP_NO_CXX11_HDR_INITIALIZER_LIST)

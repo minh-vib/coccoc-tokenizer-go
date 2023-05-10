@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <vector>
 #include <cassert>
+#include <new>
 #include <tokenizer/tokenizer.hpp>
 #include "com_coccoc_Tokenizer.h"
 
@@ -13,8 +14,15 @@ JNIEXPORT jlong JNICALL Java_com_coccoc_Tokenizer_segmentPointer(
 	// return a pointer to an array of pointers
 
 	const jchar *jtext = env->GetStringCritical(jni_text, nullptr);
+	if (!jtext) {
+		return -1;
+	}
+
 	int text_length = env->GetStringLength(jni_text);
-	std::vector< uint32_t > *text = new std::vector< uint32_t >();
+	std::vector< uint32_t > *text = new (std::nothrow) std::vector< uint32_t >();
+	if (!text) {
+		return -1;
+	}
 	text->reserve(text_length);
 
 	std::vector< int > original_pos;
@@ -22,8 +30,17 @@ JNIEXPORT jlong JNICALL Java_com_coccoc_Tokenizer_segmentPointer(
 	env->ReleaseStringCritical(jni_text, jtext);
 
 	// use pointer to avoid automatic deallocation
-	std::vector< Token > *ranges = new std::vector< Token >();
-	std::vector< int > *space_positions = new std::vector< int >();
+	std::vector< Token > *ranges = new (std::nothrow) std::vector< Token >();
+	if (!ranges) {
+		delete (std::vector< uint32_t > *) (text);
+		return -1;
+	}
+
+	std::vector< int > *space_positions = new (std::nothrow) std::vector< int >();
+	if (!space_positions) {
+		delete (std::vector< Token > *) (ranges);
+		return -1;
+	}
 
 	Tokenizer::instance().handle_tokenization_request< Token >(
 		*text, *ranges, *space_positions, original_pos, for_transforming, tokenize_option, keep_puncts);
@@ -33,7 +50,11 @@ JNIEXPORT jlong JNICALL Java_com_coccoc_Tokenizer_segmentPointer(
 		ranges->at(i).original_end += original_pos[ranges->at(i).normalized_end];
 	}
 
-	int64_t *res_pointer = new int64_t[8];
+	int64_t *res_pointer = new (std::nothrow) int64_t[8];
+	if (!res_pointer) {
+		return -1;
+	}
+
 	res_pointer[0] = (int64_t) text;
 	res_pointer[1] = (int64_t) text->data(); // pointer to normalized string
 	res_pointer[2] = (int64_t) ranges->size();
@@ -42,13 +63,18 @@ JNIEXPORT jlong JNICALL Java_com_coccoc_Tokenizer_segmentPointer(
 	res_pointer[5] = (int64_t) space_positions->size();
 	res_pointer[6] = (int64_t) space_positions->data();
 	res_pointer[7] = (int64_t) space_positions;
-	return (jlong) res_pointer;
+
+	return reinterpret_cast<jlong>(res_pointer);
 }
 
 JNIEXPORT void JNICALL Java_com_coccoc_Tokenizer_freeMemory(JNIEnv *env, jobject obj, jlong res_pointer)
 {
 	// Cast each object pointer to their respective type, must be careful
-	int64_t *p = (int64_t *) res_pointer;
+	int64_t *p = reinterpret_cast<int64_t *>(res_pointer);
+	if (p == nullptr) {
+		return;
+	}
+
 	delete (std::vector< uint32_t > *) (p[0]);
 	delete (std::vector< Token > *) (p[4]);
 	delete (std::vector< int > *) (p[7]);

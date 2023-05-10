@@ -35,7 +35,7 @@ private:
 	// An array of HashMaps, represent sparse 2D array of weights
 	// Used for retrieving 2-gram weights in sticky-text-segmentation
 	std::vector< fast_map_t > nontone_pair_freq_map;
-
+	
 	struct Range
 	{
 		// int left;
@@ -83,7 +83,9 @@ private:
 			fclose(in);
 			return -1;
 		}
+
 		nontone_pair_freq_map.resize(n);
+
 		FileSerializer serializer;
 		for (int i = 0; i < n; ++i)
 		{
@@ -597,6 +599,7 @@ public:
 				}
 
 				Token last_token = ranges.back();
+
 				if (last_token.seg_type == T::URL_SEG_TYPE && !nontone_pair_freq_map.empty())
 				{
 					// sticky tokenization on URL parts
