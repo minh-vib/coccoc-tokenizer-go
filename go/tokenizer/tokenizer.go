@@ -52,17 +52,31 @@ func (opts TokenizerOption) SetTokenizeOption(value int) {
 // SetDictPath sets the dictionary path option.
 func (opts TokenizerOption) SetDictPath(path string) {
 	cpath := C.CString(path)
-	defer C.free(unsafe.Pointer(cpath))
 	C.set_dict_path(opts.ptr, cpath)
 }
 
+// Destroy releases the memory allocated for the TokenizerOption object.
+func (opts TokenizerOption) Destroy() {
+	C.destroy_tokenizer_option(opts.ptr)
+}
+
+type Tokenizer struct {
+	Options TokenizerOption
+}
+
+func NewTokenizer() Tokenizer {
+	opts := NewTokenizerOption()
+
+	return Tokenizer{Options: opts}
+}
+
 // WordTokenizer tokenizes the input text and returns a slice of strings.
-func WordTokenizer(text string, opts TokenizerOption) []string {
+func (t Tokenizer) WordTokenizer(text string) []string {
 	ctext := C.CString(text)
 	defer C.free(unsafe.Pointer(ctext))
 
 	var size C.int
-	cresult := C.word_tokenizer_c(ctext, opts.ptr, &size)
+	cresult := C.word_tokenizer_c(ctext, t.Options.ptr, &size)
 	defer C.free_string_array(cresult, size)
 
 	var goStrings []string
@@ -77,9 +91,4 @@ func WordTokenizer(text string, opts TokenizerOption) []string {
 	}
 
 	return goStrings
-}
-
-// Destroy releases the memory allocated for the TokenizerOption object.
-func (opts TokenizerOption) Destroy() {
-	C.destroy_tokenizer_option(opts.ptr)
 }

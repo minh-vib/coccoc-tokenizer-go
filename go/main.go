@@ -7,12 +7,13 @@ import (
 )
 
 func main() {
-	opts := tokenizer.NewTokenizerOption()
+	token := tokenizer.NewTokenizer()
+	token.Options.SetDictPath("/usr/local/share/tokenizer/dicts")
 
 	text := "toisongohanoi, tôi đăng ký trên Thegioididong.vn"
-	result := tokenizer.WordTokenizer(text, opts)
+	result := token.WordTokenizer(text)
 
 	fmt.Println(result)
 
-	opts.Destroy()
+	token.Options.Destroy()
 }
