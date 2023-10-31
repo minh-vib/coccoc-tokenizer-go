@@ -12,7 +12,7 @@ void destroy_tokenizer_option(void* ptr) {
 void set_tokenizer_option_defaults(void* ptr) {
     tokenizer_option* opts = static_cast<tokenizer_option*>(ptr);
     opts->no_sticky = true;
-    opts->keep_puncts = -1;
+    opts->keep_puncts = false;
     opts->for_transforming = false;
     opts->tokenize_option = Tokenizer::TOKENIZE_NORMAL;
     opts->dict_path = DICT_PATH;
