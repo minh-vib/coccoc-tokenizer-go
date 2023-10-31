@@ -1,7 +1,7 @@
 package tokenizer
 
 /*
-   #cgo LDFLAGS: -L. -ltokenizer
+   #cgo LDFLAGS: -L. -lcoccoc-tokenizer-go
    #include <stdlib.h>
    #include "../tokenizer_wrapper.h"
 */
@@ -24,7 +24,6 @@ const (
 // TokenizerOption represents the options for the tokenizer.
 type TokenizerOption struct {
 	ptr          unsafe.Pointer
-	stopWordType int
 	stopWordData map[string]bool
 }
 
@@ -45,16 +44,31 @@ func (opts *TokenizerOption) SetDefaults() {
 
 // SetNoSticky sets the no sticky option.
 func (opts *TokenizerOption) SetNoSticky(value int) {
+	if value > 1 {
+		value = 1
+	} else if value < 0 {
+		value = 0
+	}
 	C.set_no_sticky(opts.ptr, C.int(value))
 }
 
 // SetKeepPuncts sets the keep puncts option.
 func (opts *TokenizerOption) SetKeepPuncts(value int) {
+	if value > 1 {
+		value = 1
+	} else if value < 0 {
+		value = 0
+	}
 	C.set_keep_puncts(opts.ptr, C.int(value))
 }
 
 // SetForTransforming sets the for transforming option.
 func (opts *TokenizerOption) SetForTransforming(value int) {
+	if value > 1 {
+		value = 1
+	} else if value < 0 {
+		value = 0
+	}
 	C.set_for_transforming(opts.ptr, C.int(value))
 }
 
@@ -70,7 +84,6 @@ func (opts *TokenizerOption) SetDictPath(path string) {
 }
 
 func (opts *TokenizerOption) SetStopWordType(value int) {
-	opts.stopWordType = value
 	opts.stopWordData = make(map[string]bool)
 	if value == STOP_WORD_DEFAULT {
 		fileName := "./tokenizer/" + stopWordFileName
@@ -82,7 +95,7 @@ func (opts *TokenizerOption) SetStopWordType(value int) {
 
 		scanner := bufio.NewScanner(file)
 		for scanner.Scan() {
-			word := strings.TrimSpace(scanner.Text())
+			word := strings.ToLower(strings.TrimSpace(scanner.Text()))
 			opts.stopWordData[word] = true
 		}
 	}
@@ -105,7 +118,8 @@ func NewTokenizer() Tokenizer {
 
 func (tk *Tokenizer) AddStopWords(words []string) {
 	for _, word := range words {
-		tk.Options.stopWordData[strings.ToLower(word)] = true
+		word = strings.ToLower(strings.TrimSpace(word))
+		tk.Options.stopWordData[word] = true
 	}
 }
 
@@ -127,8 +141,8 @@ func (tk *Tokenizer) WordTokenizer(text string) []string {
 
 	var words []string
 	for _, s := range slice {
-		word := C.GoString(s)
-		if ok, _ := tk.Options.stopWordData[strings.ToLower(word)]; !ok {
+		word := strings.ToLower(strings.TrimSpace(C.GoString(s)))
+		if ok, _ := tk.Options.stopWordData[word]; !ok {
 			words = append(words, word)
 		}
 	}

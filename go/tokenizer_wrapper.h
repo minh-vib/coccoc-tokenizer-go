@@ -6,7 +6,6 @@ struct tokenizer_option_c {
     int keep_puncts;
     int for_transforming;
     int tokenize_option;
-    int format;
     const char *dict_path;
 };
 

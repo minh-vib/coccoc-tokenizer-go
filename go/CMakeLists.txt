@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(tokenizer_wrapper)
+project(coccoc-tokenizer-go)
 INCLUDE_DIRECTORIES (../)
 set(CMAKE_CXX_STANDARD 14)
-add_library(Tokenizer SHARED tokenizer_wrapper.cpp)
+add_library(coccoc-tokenizer-go SHARED tokenizer_wrapper.cpp)
