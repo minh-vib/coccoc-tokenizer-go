@@ -3,7 +3,7 @@ package tokenizer
 /*
    #cgo LDFLAGS: -L. -lcoccoc-tokenizer-go
    #include <stdlib.h>
-   #include "../tokenizer_wrapper.h"
+   #include "./wrapper/tokenizer_wrapper.h"
 */
 import "C"
 import (
@@ -86,7 +86,7 @@ func (opts *TokenizerOption) SetDictPath(path string) {
 func (opts *TokenizerOption) SetStopWordType(value int) {
 	opts.stopWordData = make(map[string]bool)
 	if value == STOP_WORD_DEFAULT {
-		fileName := "./tokenizer/" + stopWordFileName
+		fileName := "./dicts/" + stopWordFileName
 		file, err := os.Open(fileName)
 		if err != nil {
 			return
