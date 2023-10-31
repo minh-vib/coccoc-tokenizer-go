@@ -1,3 +1,3 @@
-module github.com/minh.hoang/coccoc-tokenizer-go
+module github.com/minh-vib/coccoc-tokenizer-go
 
 go 1.20

@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/minh.hoang/coccoc-tokenizer-go"
+	"github.com/minh-vib/coccoc-tokenizer-go"
 )
 
 func main() {
