@@ -21,6 +21,10 @@ const (
 	stopWordFileName = "vi-stopwords.txt"
 )
 
+type Tokenizer struct {
+	Options TokenizerOption
+}
+
 // TokenizerOption represents the options for the tokenizer.
 type TokenizerOption struct {
 	ptr          unsafe.Pointer
@@ -104,10 +108,6 @@ func (opts *TokenizerOption) SetStopWordType(value int) {
 // Destroy releases the memory allocated for the TokenizerOption object.
 func (opts *TokenizerOption) Destroy() {
 	C.destroy_tokenizer_option(opts.ptr)
-}
-
-type Tokenizer struct {
-	Options TokenizerOption
 }
 
 func NewTokenizer() Tokenizer {
