@@ -28,6 +28,7 @@ type Tokenizer struct {
 // TokenizerOption represents the options for the tokenizer.
 type TokenizerOption struct {
 	ptr          unsafe.Pointer
+	dictPath     string
 	stopWordData map[string]bool
 }
 
@@ -42,55 +43,55 @@ func NewTokenizerOption() TokenizerOption {
 }
 
 // SetDefaults sets the default options for the tokenizer.
-func (opts *TokenizerOption) SetDefaults() {
-	C.set_tokenizer_option_defaults(opts.ptr)
+func (opt *TokenizerOption) SetDefaults() {
+	C.set_tokenizer_option_defaults(opt.ptr)
 }
 
 // SetNoSticky sets the no sticky option.
-func (opts *TokenizerOption) SetNoSticky(value int) {
+func (opt *TokenizerOption) SetNoSticky(value int) {
 	if value > 1 {
 		value = 1
 	} else if value < 0 {
 		value = 0
 	}
-	C.set_no_sticky(opts.ptr, C.int(value))
+	C.set_no_sticky(opt.ptr, C.int(value))
 }
 
 // SetKeepPuncts sets the keep puncts option.
-func (opts *TokenizerOption) SetKeepPuncts(value int) {
+func (opt *TokenizerOption) SetKeepPuncts(value int) {
 	if value > 1 {
 		value = 1
 	} else if value < 0 {
 		value = 0
 	}
-	C.set_keep_puncts(opts.ptr, C.int(value))
+	C.set_keep_puncts(opt.ptr, C.int(value))
 }
 
 // SetForTransforming sets the for transforming option.
-func (opts *TokenizerOption) SetForTransforming(value int) {
+func (opt *TokenizerOption) SetForTransforming(value int) {
 	if value > 1 {
 		value = 1
 	} else if value < 0 {
 		value = 0
 	}
-	C.set_for_transforming(opts.ptr, C.int(value))
+	C.set_for_transforming(opt.ptr, C.int(value))
 }
 
 // SetTokenizeOption sets the tokenize option.
-func (opts *TokenizerOption) SetTokenizeOption(value int) {
-	C.set_tokenize_option(opts.ptr, C.int(value))
+func (opt *TokenizerOption) SetTokenizeOption(value int) {
+	C.set_tokenize_option(opt.ptr, C.int(value))
 }
 
 // SetDictPath sets the dictionary path option.
-func (opts *TokenizerOption) SetDictPath(path string) {
-	cpath := C.CString(path)
-	C.set_dict_path(opts.ptr, cpath)
+func (opt *TokenizerOption) SetDictPath(path string) {
+	opt.dictPath = C.CString(path)
+	C.set_dict_path(opt.ptr, opt.dictPath)
 }
 
-func (opts *TokenizerOption) SetStopWordType(value int) {
-	opts.stopWordData = make(map[string]bool)
+func (opt *TokenizerOption) SetStopWordType(value int) {
+	opt.stopWordData = make(map[string]bool)
 	if value == STOP_WORD_DEFAULT {
-		fileName := "./dicts/" + stopWordFileName
+		fileName := opt.dictPath + "/" + stopWordFileName
 		file, err := os.Open(fileName)
 		if err != nil {
 			return
@@ -100,36 +101,35 @@ func (opts *TokenizerOption) SetStopWordType(value int) {
 		scanner := bufio.NewScanner(file)
 		for scanner.Scan() {
 			word := strings.ToLower(strings.TrimSpace(scanner.Text()))
-			opts.stopWordData[word] = true
+			opt.stopWordData[word] = true
 		}
 	}
 }
 
 // Destroy releases the memory allocated for the TokenizerOption object.
-func (opts *TokenizerOption) Destroy() {
-	C.destroy_tokenizer_option(opts.ptr)
+func (opt *TokenizerOption) Destroy() {
+	C.destroy_tokenizer_option(opt.ptr)
 }
 
 func NewTokenizer() Tokenizer {
-	opts := NewTokenizerOption()
-
-	return Tokenizer{Options: opts}
+	opt := NewTokenizerOption()
+	return Tokenizer{Options: opt}
 }
 
-func (tk *Tokenizer) AddStopWords(words []string) {
+func (tkn *Tokenizer) AddStopWords(words []string) {
 	for _, word := range words {
 		word = strings.ToLower(strings.TrimSpace(word))
-		tk.Options.stopWordData[word] = true
+		tkn.Options.stopWordData[word] = true
 	}
 }
 
 // WordTokenizer tokenizes the input text and returns a slice of strings.
-func (tk *Tokenizer) WordTokenizer(text string) []string {
+func (tkn *Tokenizer) WordTokenizer(text string) []string {
 	ctext := C.CString(text)
 	defer C.free(unsafe.Pointer(ctext))
 
 	var size C.int
-	cresult := C.word_tokenizer_c(ctext, tk.Options.ptr, &size)
+	cresult := C.word_tokenizer_c(ctext, tkn.Options.ptr, &size)
 	defer C.free_string_array(cresult, size)
 
 	header := reflect.SliceHeader{
@@ -142,7 +142,7 @@ func (tk *Tokenizer) WordTokenizer(text string) []string {
 	var words []string
 	for _, s := range slice {
 		word := strings.ToLower(strings.TrimSpace(C.GoString(s)))
-		if ok, _ := tk.Options.stopWordData[word]; !ok {
+		if ok, _ := tkn.Options.stopWordData[word]; !ok {
 			words = append(words, word)
 		}
 	}
