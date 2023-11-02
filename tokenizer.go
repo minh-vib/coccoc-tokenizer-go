@@ -15,6 +15,8 @@ import (
 )
 
 const (
+	DICT_PATH = "/usr/local/share/tokenizer/dicts"
+
 	STOP_WORD_DEFAULT = 0
 	STOP_WORD_CUSTOM  = 1
 
@@ -29,6 +31,7 @@ type Tokenizer struct {
 type TokenizerOption struct {
 	ptr          unsafe.Pointer
 	dictPath     string
+	stopWordType int
 	stopWordData map[string]bool
 }
 
@@ -36,7 +39,9 @@ type TokenizerOption struct {
 func NewTokenizerOption() TokenizerOption {
 	ptr := C.create_tokenizer_option()
 	C.set_tokenizer_option_defaults(ptr)
+
 	options := TokenizerOption{ptr: ptr}
+	options.dictPath = DICT_PATH
 	options.SetStopWordType(STOP_WORD_DEFAULT)
 
 	return options
@@ -84,11 +89,17 @@ func (opt *TokenizerOption) SetTokenizeOption(value int) {
 
 // SetDictPath sets the dictionary path option.
 func (opt *TokenizerOption) SetDictPath(path string) {
-	opt.dictPath = C.CString(path)
-	C.set_dict_path(opt.ptr, opt.dictPath)
+	cpath := C.CString(path)
+	C.set_dict_path(opt.ptr, cpath)
+
+	opt.dictPath = path
+	if len(opt.stopWordData) == 0 {
+		opt.SetStopWordType(opt.stopWordType)
+	}
 }
 
 func (opt *TokenizerOption) SetStopWordType(value int) {
+	opt.stopWordType = value
 	opt.stopWordData = make(map[string]bool)
 	if value == STOP_WORD_DEFAULT {
 		fileName := opt.dictPath + "/" + stopWordFileName
@@ -139,13 +150,13 @@ func (tkn *Tokenizer) WordTokenizer(text string) []string {
 	}
 	slice := *(*[]*C.char)(unsafe.Pointer(&header))
 
-	var words []string
+	var goStrings []string
 	for _, s := range slice {
-		word := strings.ToLower(strings.TrimSpace(C.GoString(s)))
-		if ok, _ := tkn.Options.stopWordData[word]; !ok {
-			words = append(words, word)
+		goString := strings.ToLower(strings.TrimSpace(C.GoString(s)))
+		if ok, _ := tkn.Options.stopWordData[goString]; !ok {
+			goStrings = append(goStrings, goString)
 		}
 	}
 
-	return words
+	return goStrings
 }
