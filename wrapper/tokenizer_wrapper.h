@@ -3,6 +3,7 @@
 
 struct tokenizer_option_c {
     int no_sticky;
+    int keep_original;
     int keep_puncts;
     int for_transforming;
     int tokenize_option;
@@ -16,6 +17,7 @@ extern "C" {
 void* create_tokenizer_option();
 void destroy_tokenizer_option(void* ptr);
 void set_tokenizer_option_defaults(void* ptr);
+void set_keep_original(void* ptr, int value);
 void set_no_sticky(void* ptr, int value);
 void set_keep_puncts(void* ptr, int value);
 void set_for_transforming(void* ptr, int value);

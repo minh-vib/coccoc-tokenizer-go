@@ -12,6 +12,7 @@ void destroy_tokenizer_option(void* ptr) {
 void set_tokenizer_option_defaults(void* ptr) {
     tokenizer_option* opts = static_cast<tokenizer_option*>(ptr);
     opts->no_sticky = true;
+    opts->keep_original = false;
     opts->keep_puncts = false;
     opts->for_transforming = false;
     opts->tokenize_option = Tokenizer::TOKENIZE_NORMAL;
@@ -21,6 +22,11 @@ void set_tokenizer_option_defaults(void* ptr) {
 void set_no_sticky(void* ptr, int value) {
     tokenizer_option* opts = static_cast<tokenizer_option*>(ptr);
     opts->no_sticky = value;
+}
+
+void set_keep_original(void* ptr, int value) {
+    tokenizer_option* opts = static_cast<tokenizer_option*>(ptr);
+    opts->keep_original = value;
 }
 
 void set_keep_puncts(void* ptr, int value) {
