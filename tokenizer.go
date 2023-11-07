@@ -11,10 +11,6 @@ import (
 	"unsafe"
 )
 
-const (
-	DICT_PATH = "/usr/local/share/tokenizer/dicts"
-)
-
 type Tokenizer struct {
 	Options TokenizerOption
 }

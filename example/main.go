@@ -11,7 +11,7 @@ func main() {
 	tk := tokenizer.NewTokenizer()
 	tk.Options.SetNoSticky(0)
 	tk.Options.SetKeepOriginal(1)
-	tk.Options.SetDictPath("/usr/local/share/tokenizer/dicts")
+	//tk.Options.SetDictPath("/usr/local/share/tokenizer/dicts")
 
 	text := "Từng bước để trở thành một lập trình viên giỏi"
 	result := tk.WordTokenizer(text)
